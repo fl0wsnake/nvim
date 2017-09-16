@@ -91,7 +91,8 @@ let g:fzf_layout = { 'down': '~30%' }
 " let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ node_modules/ elm-stuff/ -l -g ""'
 let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ -l -g ""'
 " nnoremap <Leader>ww :Windows<CR>
-noremap <silent> <Leader>pf :Files<CR>
+noremap <silent> <Leader>pf :GFiles<CR>
+noremap <silent> <Leader>ff :Files<CR>
 noremap <silent> <Leader>sa :FZF -x ~<CR>
 noremap <silent> <Leader>sp :Ag<CR>
 noremap <silent> <Leader>ss :BLines<CR>
