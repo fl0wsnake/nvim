@@ -9,30 +9,22 @@ Plug 'junegunn/fzf.vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/vimfiler'
-" Plug 'Shougo/vinarise'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
 Plug 'bling/vim-airline'
 Plug 'kassio/neoterm'
+Plug 'sirver/ultisnips'
 Plug 'pangloss/vim-javascript'
 Plug 'mhartington/nvim-typescript'
 Plug 'HerringtonDarkholme/yats'
-Plug 'sirver/ultisnips'
+Plug 'pbogut/deoplete-elm'
+Plug 'ElmCast/elm-vim'
 call plug#end()
 
 
-inoremap <expr> <tab> pumvisible() ? deoplete#close_popup() : "\<tab>"
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function() abort
-	return "\<CR>"
-endfunction
-
-
-let g:UltiSnipsExpandTrigger="nil"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:echodoc_enable_at_startup = 1
+let g:deoplete#enable_at_startup=1
 
 " interface
 set updatetime=250
@@ -45,8 +37,7 @@ set lazyredraw
 set nohlsearch
 set helpheight=99999
 let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#win_nr_show = 1
-let g:deoplete#enable_at_startup=1
+let g:airline#extensions#tabline#fnamemod = ':t'
 set mouse-=a
 set clipboard=unnamedplus
 set noshowmode
@@ -137,13 +128,15 @@ nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
 
 
-" vimfiler
-map <silent> <Leader>pt :VimFiler<CR>
-let g:vimfiler_direction = "topleft"
-noremap <space>pt :VimFilerBufferDir -explorer<CR>
-call vimfiler#custom#profile('default', 'context', {
-          \ 'safe' : 0,
-          \ })
+" tab completion
+inoremap <expr> <tab> pumvisible() ? deoplete#close_popup() : "\<tab>"
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function() abort
+	return "\<CR>"
+endfunction
+let g:UltiSnipsExpandTrigger="nil"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 
 " langs
@@ -170,3 +163,37 @@ augroup my_augroup
 " elm
     autocmd FileType elm nmap <buffer> K :ElmShowDocs<CR>
 augroup END
+
+
+" vimfiler
+noremap <Leader>ft :VimFilerBufferDir -explorer<CR>
+noremap <Leader>pt :VimFiler -explorer<CR>
+" use this function to toggle vimfiler
+function! s:vimfiler_toggle()
+  if &filetype == 'vimfiler'
+    execute 'silent! buffer #'
+    if &filetype == 'vimfiler'
+      execute 'enew'
+    endif
+  elseif exists('t:vimfiler_buffer') && bufexists(t:vimfiler_buffer)
+    execute 'buffer ' . t:vimfiler_buffer
+  else
+    execute 'VimFilerCreate'
+    let t:vimfiler_buffer = @%
+  endif
+endfunction
+
+" make vimfiler buffer behave
+function! s:vimfiler_buffer_au()
+  setlocal nobuflisted
+  setlocal colorcolumn=
+endfunction
+autocmd FileType vimfiler call s:vimfiler_buffer_au()
+
+let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_ignore_pattern = []
+let g:vimfiler_safe_mode_by_default = 0
+let g:vimfiler_tree_leaf_icon = ' '
+let g:vimfiler_tree_opened_icon = '▾'
+let g:vimfiler_tree_closed_icon = '▸'
+let g:vimfiler_enable_auto_cd = 1
