@@ -1,14 +1,15 @@
 call plug#begin('~/.vim/plugged')
 Plug 'neomake/neomake'
+Plug 'Shougo/vimproc', {'do': 'make'}
 Plug 'morhetz/gruvbox'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'Shougo/vimproc', {'do': 'make'}
 Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/vimfiler'
+" Plug 'Shougo/vinarise'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
@@ -61,10 +62,6 @@ set tabstop=4
 set number
 set relativenumber
 set scrolloff=3
-
-
-" vimfiler
-map <silent> <Leader>pt :VimFiler<CR>
 
 
 " leaders
@@ -141,8 +138,12 @@ nnoremap <C-y> 2<C-y>
 
 
 " vimfiler
+map <silent> <Leader>pt :VimFiler<CR>
 let g:vimfiler_direction = "topleft"
 noremap <space>pt :VimFilerBufferDir -explorer<CR>
+call vimfiler#custom#profile('default', 'context', {
+          \ 'safe' : 0,
+          \ })
 
 
 " langs
