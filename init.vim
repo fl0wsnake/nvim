@@ -11,7 +11,8 @@ Plug 'Shougo/unite.vim'
 Plug 'Shougo/vimfiler'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-fugitive'
+Plug 'jreybert/vimagit'
+" Plug 'tpope/vim-fugitive'
 Plug 'bling/vim-airline'
 Plug 'kassio/neoterm'
 Plug 'sirver/ultisnips'
@@ -37,6 +38,8 @@ set lazyredraw
 set nohlsearch
 set helpheight=99999
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#show_buffers = 0
+let g:airline#extensions#tabline#show_tabs = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 set mouse-=a
 set clipboard=unnamedplus
@@ -71,14 +74,22 @@ noremap <silent> <Leader>fr :e<CR>
 noremap <silent> <Leader>qq :qa<CR>
 noremap <silent> <Leader>qQ :qa!<CR>
 noremap <silent> <Leader>qs :wqa<CR>
-noremap <silent> <Leader>fv :e ~/.config/nvim/init.vim<CR>
+noremap <silent> <Leader>vd :e ~/.config/nvim/init.vim<CR>
+noremap <silent> <Leader>vs :so $MYVIMRC<CR>
+noremap <silent> <Leader>vi :PlugInstall<CR>
+noremap <silent> <Leader>vp :so $MYVIMRC<CR>:PlugInstall<CR>
+noremap <Leader>fD :call delete(expand('%'))<CR> :bdelete!<CR>
+noremap <Leader>bd :call :bdelete!<CR>
+nnoremap <C-n> :bnext<CR>
+nnoremap <C-p> :bprevious<CR>
+noremap <Leader>gs :MagitOnly<CR>
 
 
 " fzf
 let g:fzf_layout = { 'down': '~30%' }
 " let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ node_modules/ elm-stuff/ -l -g ""'
 let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ -l -g ""'
-" nnoremap <Leader>ww :Windows<CR>
+noremap <silent> <Leader>ww :Windows<CR>
 noremap <silent> <Leader>pf :GFiles<CR>
 noremap <silent> <Leader>ff :Files<CR>
 noremap <silent> <Leader>sa :FZF -x ~<CR>
@@ -89,7 +100,7 @@ noremap <silent> <Leader>s/ :History/<CR>
 noremap <silent> <Leader>fr :History<CR>
 noremap <silent> <Leader>as :Snippets<CR>
 noremap <silent> <Leader><Leader> :Commands<CR>
-noremap <silent> <Leader><tab> :b# <CR>
+noremap <silent> <Leader><tab> :b#<CR>
 " window switching
 map <silent> <Leader>1 :1wincmd W<CR>
 map <silent> <Leader>2 :2wincmd W<CR>
@@ -115,6 +126,8 @@ nnoremap c "_c
 nnoremap C "_C
 vnoremap c "_c
 vnoremap C "_C
+" Y yanks till the end of line instead of ynaking the whole line
+noremap Y y$
 " g{n} for tab switch
 noremap g1 1gt
 noremap g2 2gt
