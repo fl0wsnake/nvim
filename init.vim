@@ -1,26 +1,33 @@
 call plug#begin('~/.vim/plugged')
 Plug 'neomake/neomake'
 Plug 'Shougo/vimproc', {'do': 'make'}
-Plug 'morhetz/gruvbox'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'jiangmiao/auto-pairs'
-Plug 'Shougo/unite.vim'
 Plug 'Shougo/vimfiler'
+Plug 'Shougo/unite.vim'
+Plug 'jreybert/vimagit'
+Plug 'bling/vim-airline'
+Plug 'morhetz/gruvbox'
+" syntax
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
+Plug 'sirver/ultisnips'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
-Plug 'jreybert/vimagit'
-" Plug 'tpope/vim-fugitive'
-Plug 'bling/vim-airline'
-Plug 'kassio/neoterm'
-Plug 'sirver/ultisnips'
+Plug 'jiangmiao/auto-pairs'
+Plug 'simnalamburt/vim-mundo'
+Plug 'tpope/vim-repeat'
+" js
 Plug 'pangloss/vim-javascript'
+" ts
 Plug 'mhartington/nvim-typescript'
-Plug 'HerringtonDarkholme/yats'
+Plug 'leafgarland/typescript-vim'
+" elm 
 Plug 'pbogut/deoplete-elm'
 Plug 'ElmCast/elm-vim'
+" haskell
+" Plug 'parsonsmatt/intero-neovim' " error checking
+Plug 'eagletmt/neco-ghc' " syntax and completion
 call plug#end()
 
 
@@ -28,12 +35,14 @@ let g:echodoc_enable_at_startup = 1
 let g:deoplete#enable_at_startup=1
 
 " interface
+set ignorecase
 set updatetime=250
 set shortmess+=c
 set completeopt-=preview
 set completeopt+=noinsert
 set nocursorline
 set nocursorcolumn
+" set synmaxcol=256
 set lazyredraw
 set nohlsearch
 set helpheight=99999
@@ -41,7 +50,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#show_tabs = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
-set mouse-=a
+" set mouse-=a
 set clipboard=unnamedplus
 set noshowmode
 set cmdheight=2 " for echodoc prompts
@@ -65,24 +74,30 @@ let maplocalleader=","
 
 " keymaps
 noremap <silent> <Leader>wd :q<CR>
+noremap <silent> <Leader>wD :q!<CR>
 noremap <silent> <Leader>wv :vsplit<CR>
 noremap <silent> <Leader>wt :tabe<CR>
 noremap <silent> <Leader>wm :only<CR>
 noremap <silent> <Leader>fs :w<CR>
 noremap <silent> <Leader>fS :wa<CR>
-noremap <silent> <Leader>fr :e<CR>
+noremap <silent> <Leader>fe :e<CR>
 noremap <silent> <Leader>qq :qa<CR>
 noremap <silent> <Leader>qQ :qa!<CR>
 noremap <silent> <Leader>qs :wqa<CR>
-noremap <silent> <Leader>vd :e ~/.config/nvim/init.vim<CR>
+noremap <silent> <Leader>vd :tabe ~/.config/nvim/init.vim<CR>
+noremap <silent> <Leader>vD :e ~/.config/nvim/init.vim<CR>
 noremap <silent> <Leader>vs :so $MYVIMRC<CR>
 noremap <silent> <Leader>vi :PlugInstall<CR>
 noremap <silent> <Leader>vp :so $MYVIMRC<CR>:PlugInstall<CR>
-noremap <Leader>fD :call delete(expand('%'))<CR> :bdelete!<CR>
-noremap <Leader>bd :call :bdelete!<CR>
-nnoremap <C-n> :bnext<CR>
-nnoremap <C-p> :bprevious<CR>
-noremap <Leader>gs :MagitOnly<CR>
+noremap <silent> <Leader>fD :call delete(expand('%'))<CR> :bdelete!<CR>
+noremap <silent> <Leader>bd :call :bdelete!<CR>
+nnoremap <silent> <C-n> :bnext<CR>
+nnoremap <silent> <C-p> :bprevious<CR>
+noremap <silent> <Leader>gs :MagitOnly<CR>
+nnoremap <silent> <A-j> :m .+1<CR>
+nnoremap <silent> <A-k> :m .-2<CR>
+nnoremap <silent> <A-h> :bnext<CR>
+nnoremap <silent> <A-l> :bprevious<CR> 
 
 
 " fzf
@@ -98,21 +113,22 @@ noremap <silent> <Leader>ss :BLines<CR>
 noremap <silent> <Leader>s: :History:<CR>
 noremap <silent> <Leader>s/ :History/<CR>
 noremap <silent> <Leader>fr :History<CR>
+noremap <silent> <Leader>fR :tabe<CR>:History<CR>
 noremap <silent> <Leader>as :Snippets<CR>
 noremap <silent> <Leader><Leader> :Commands<CR>
 noremap <silent> <Leader><tab> :b#<CR>
 " window switching
-map <silent> <Leader>1 :1wincmd W<CR>
-map <silent> <Leader>2 :2wincmd W<CR>
-map <silent> <Leader>3 :3wincmd W<CR>
-map <silent> <Leader>4 :4wincmd W<CR>
-map <silent> <Leader>5 :5wincmd W<CR>
-map <silent> <Leader>6 :6wincmd W<CR>
-map <silent> <Leader>7 :7wincmd W<CR>
-map <silent> <Leader>8 :8wincmd W<CR>
-map <silent> <Leader>9 :9wincmd W<CR>
+noremap <silent> <Leader>1 :1wincmd W<CR>
+noremap <silent> <Leader>2 :2wincmd W<CR>
+noremap <silent> <Leader>3 :3wincmd W<CR>
+noremap <silent> <Leader>4 :4wincmd W<CR>
+noremap <silent> <Leader>5 :5wincmd W<CR>
+noremap <silent> <Leader>6 :6wincmd W<CR>
+noremap <silent> <Leader>7 :7wincmd W<CR>
+noremap <silent> <Leader>8 :8wincmd W<CR>
+noremap <silent> <Leader>9 :9wincmd W<CR>
 " paste in insert mode
-imap <C-v> <Esc>pa
+inoremap <C-v> <Esc>pa
 " delete without yanking
 nnoremap <space>d "_d
 vnoremap <space>d "_d
@@ -138,6 +154,16 @@ noremap g6 6gt
 noremap g7 7gt
 noremap g8 8gt
 noremap g9 9gt
+" M-{n} for tab switch
+noremap <M-1> 1gt
+noremap <M-2> 2gt
+noremap <M-3> 3gt
+noremap <M-4> 4gt
+noremap <M-5> 5gt
+noremap <M-6> 6gt
+noremap <M-7> 7gt
+noremap <M-8> 8gt
+noremap <M-9> 9gt
 " faster scrolling
 nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
@@ -152,6 +178,9 @@ endfunction
 let g:UltiSnipsExpandTrigger="nil"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+
+noremap <silent> <Leader>au :MundoToggle<CR>
 
 
 " langs
@@ -171,13 +200,15 @@ augroup my_augroup
 " save buffers on focus loss
     autocmd FocusLost * silent! wa
 " typescript
-    autocmd FileType typescript nmap <buffer> K :TSDoc<CR>
-	autocmd FileType typescript nmap <buffer> <M-CR> :TSImport<CR>
-	autocmd FileType typescript nmap <buffer> <C-b> :TSDef<CR>
-	autocmd FileType typescript nmap <buffer> <C-S-b> :TSTypeDef<CR>
+    autocmd FileType typescript noremap <buffer> K :TSDoc<CR>
+	autocmd FileType typescript noremap <buffer> <M-CR> :TSImport<CR>
+	autocmd FileType typescript noremap <buffer> <C-b> :TSDef<CR>
+	autocmd FileType typescript noremap <buffer> <C-S-b> :TSTypeDef<CR>
 " elm
     autocmd FileType elm nmap <buffer> K :ElmShowDocs<CR>
 augroup END
+" haskell
+let g:necoghc_enable_detailed_browse = 1
 
 
 " vimfiler
