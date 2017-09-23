@@ -17,6 +17,7 @@ Plug 'tpope/vim-surround'
 Plug 'jiangmiao/auto-pairs'
 Plug 'simnalamburt/vim-mundo'
 Plug 'tpope/vim-repeat'
+Plug 'svermeulen/vim-easyclip'
 " js
 Plug 'pangloss/vim-javascript'
 " ts
@@ -91,13 +92,14 @@ noremap <silent> <Leader>vi :PlugInstall<CR>
 noremap <silent> <Leader>vp :so $MYVIMRC<CR>:PlugInstall<CR>
 noremap <silent> <Leader>fD :call delete(expand('%'))<CR> :bdelete!<CR>
 noremap <silent> <Leader>bd :call :bdelete!<CR>
-nnoremap <silent> <C-n> :bnext<CR>
-nnoremap <silent> <C-p> :bprevious<CR>
+noremap <silent> <C-n> :bnext<CR>
+noremap <silent> <C-p> :bprevious<CR>
 noremap <silent> <Leader>gs :MagitOnly<CR>
 nnoremap <silent> <A-j> :m .+1<CR>
 nnoremap <silent> <A-k> :m .-2<CR>
 nnoremap <silent> <A-h> :bnext<CR>
 nnoremap <silent> <A-l> :bprevious<CR> 
+nnoremap <silent> <Leader>V ggvG$<CR> 
 
 
 " fzf
@@ -111,6 +113,7 @@ noremap <silent> <Leader>sa :FZF -x ~<CR>
 noremap <silent> <Leader>sp :Ag<CR>
 noremap <silent> <Leader>ss :BLines<CR>
 noremap <silent> <Leader>s: :History:<CR>
+noremap <silent> <Leader>sc :History:<CR>
 noremap <silent> <Leader>s/ :History/<CR>
 noremap <silent> <Leader>fr :History<CR>
 noremap <silent> <Leader>fR :tabe<CR>:History<CR>
@@ -129,20 +132,11 @@ noremap <silent> <Leader>8 :8wincmd W<CR>
 noremap <silent> <Leader>9 :9wincmd W<CR>
 " paste in insert mode
 inoremap <C-v> <Esc>pa
-" delete without yanking
-nnoremap <space>d "_d
-vnoremap <space>d "_d
-nnoremap <space>D "_D
-vnoremap <space>D "_D
-" visual never changes registers
-vnoremap p "_dP
-vnoremap P "_dp
-" change never changes registers
-nnoremap c "_c
-nnoremap C "_C
-vnoremap c "_c
-vnoremap C "_C
-" Y yanks till the end of line instead of ynaking the whole line
+
+" easyclip
+let g:EasyClipUseSubstituteDefaults = 1
+
+" Y yanks till the end of line
 noremap Y y$
 " g{n} for tab switch
 noremap g1 1gt
