@@ -93,7 +93,7 @@ noremap <silent> <leader>vd :e ~/.config/nvim/init.vim<cr>
 noremap <silent> <leader>vs :so $MYVIMRC<cr>
 noremap <silent> <leader>vi :PlugInstall<cr>
 noremap <silent> <leader>vp :so $MYVIMRC<cr>:PlugInstall<cr>
-noremap <silent> <leader>fD :call delete(expand('%'))<cr> :bdelete!<cr>
+noremap <silent> <leader>fD :call delete(expand('%'))<cr>:bdelete!<cr>
 noremap <silent> <leader>bd :call :bdelete!<cr>
 noremap <silent> <M-h> :bprevious<cr>
 noremap <silent> <M-l> :bnext<cr>
