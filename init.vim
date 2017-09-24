@@ -27,15 +27,18 @@ Plug 'leafgarland/typescript-vim'
 Plug 'pbogut/deoplete-elm'
 Plug 'ElmCast/elm-vim'
 " haskell
-" Plug 'parsonsmatt/intero-neovim' " error checking
-Plug 'eagletmt/neco-ghc' " syntax and completion
+Plug 'eagletmt/neco-ghc'
+Plug 'eagletmt/ghcmod-vim'
+" org-mode
+Plug 'jceb/vim-orgmode'
+Plug 'tpope/vim-speeddating'
 call plug#end()
 
-
 let g:echodoc_enable_at_startup = 1
-let g:deoplete#enable_at_startup=1
+let g:deoplete#enable_at_startup = 1
 
 " interface
+set noswapfile
 set ignorecase
 set updatetime=250
 set shortmess+=c
@@ -43,7 +46,6 @@ set completeopt-=preview
 set completeopt+=noinsert
 set nocursorline
 set nocursorcolumn
-" set synmaxcol=256
 set lazyredraw
 set nohlsearch
 set helpheight=99999
@@ -51,8 +53,9 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#show_tabs = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
-" set mouse-=a
+" set clipboard=unnamed
 set clipboard=unnamedplus
+" set clipboard=unnamed,unnamedplus
 set noshowmode
 set cmdheight=2 " for echodoc prompts
 set hidden
@@ -74,140 +77,89 @@ let maplocalleader=","
 
 
 " keymaps
-noremap <silent> <Leader>wd :q<CR>
-noremap <silent> <Leader>wD :q!<CR>
-noremap <silent> <Leader>wv :vsplit<CR>
-noremap <silent> <Leader>wt :tabe<CR>
-noremap <silent> <Leader>wm :only<CR>
-noremap <silent> <Leader>fs :w<CR>
-noremap <silent> <Leader>fS :wa<CR>
-noremap <silent> <Leader>fe :e<CR>
-noremap <silent> <Leader>qq :qa<CR>
-noremap <silent> <Leader>qQ :qa!<CR>
-noremap <silent> <Leader>qs :wqa<CR>
-noremap <silent> <Leader>vd :tabe ~/.config/nvim/init.vim<CR>
-noremap <silent> <Leader>vD :e ~/.config/nvim/init.vim<CR>
-noremap <silent> <Leader>vs :so $MYVIMRC<CR>
-noremap <silent> <Leader>vi :PlugInstall<CR>
-noremap <silent> <Leader>vp :so $MYVIMRC<CR>:PlugInstall<CR>
-noremap <silent> <Leader>fD :call delete(expand('%'))<CR> :bdelete!<CR>
-noremap <silent> <Leader>bd :call :bdelete!<CR>
-noremap <silent> <C-n> :bnext<CR>
-noremap <silent> <C-p> :bprevious<CR>
-noremap <silent> <Leader>gs :MagitOnly<CR>
-nnoremap <silent> <A-j> :m .+1<CR>
-nnoremap <silent> <A-k> :m .-2<CR>
-nnoremap <silent> <A-h> :bnext<CR>
-nnoremap <silent> <A-l> :bprevious<CR> 
-nnoremap <silent> <Leader>V ggvG$<CR> 
-
-
+noremap <silent> <leader>wd :q<cr>
+noremap <silent> <leader>wD :q!<cr>
+noremap <silent> <leader>wv :vsplit<cr>
+noremap <silent> <leader>wt :tabe<cr>
+noremap <silent> <leader>wm :only<cr>
+noremap <silent> <leader>fs :w<cr>
+noremap <silent> <leader>fS :wa<cr>
+noremap <silent> <leader>fe :e<cr>
+noremap <silent> <leader>qq :qa<cr>
+noremap <silent> <leader>qQ :qa!<cr>
+noremap <silent> <leader>qs :wqa<cr>
+noremap <silent> <leader>vD :tabe ~/.config/nvim/init.vim<cr>
+noremap <silent> <leader>vd :e ~/.config/nvim/init.vim<cr>
+noremap <silent> <leader>vs :so $MYVIMRC<cr>
+noremap <silent> <leader>vi :PlugInstall<cr>
+noremap <silent> <leader>vp :so $MYVIMRC<cr>:PlugInstall<cr>
+noremap <silent> <leader>fD :call delete(expand('%'))<cr> :bdelete!<cr>
+noremap <silent> <leader>bd :call :bdelete!<cr>
+noremap <silent> <M-h> :bprevious<cr>
+noremap <silent> <M-l> :bnext<cr>
+noremap <silent> <leader>gs :MagitOnly<cr>
+nnoremap <silent> <A-j> :m .+1<cr>
+nnoremap <silent> <A-k> :m .-2<cr>
+nnoremap <silent> <A-h> :bnext<cr>
+nnoremap <silent> <A-l> :bprevious<cr> 
+nnoremap <silent> <leader>V ggvG$<cr> 
+noremap <silent> <leader>au :MundoToggle<cr>
+noremap <leader>ft :VimFilerBufferDir -explorer<cr>
+noremap <leader>pt :VimFiler -explorer<cr>
+noremap <leader>r :reg<cr>
+noremap <leader>hb :map 
+" paste in insert mode
+inoremap <C-v> <C-r>*
 " fzf
 let g:fzf_layout = { 'down': '~30%' }
 " let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ node_modules/ elm-stuff/ -l -g ""'
 let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ -l -g ""'
-noremap <silent> <Leader>ww :Windows<CR>
-noremap <silent> <Leader>pf :GFiles<CR>
-noremap <silent> <Leader>ff :Files<CR>
-noremap <silent> <Leader>sa :FZF -x ~<CR>
-noremap <silent> <Leader>sp :Ag<CR>
-noremap <silent> <Leader>ss :BLines<CR>
-noremap <silent> <Leader>s: :History:<CR>
-noremap <silent> <Leader>sc :History:<CR>
-noremap <silent> <Leader>s/ :History/<CR>
-noremap <silent> <Leader>fr :History<CR>
-noremap <silent> <Leader>fR :tabe<CR>:History<CR>
-noremap <silent> <Leader>as :Snippets<CR>
-noremap <silent> <Leader><Leader> :Commands<CR>
-noremap <silent> <Leader><tab> :b#<CR>
-" window switching
-noremap <silent> <Leader>1 :1wincmd W<CR>
-noremap <silent> <Leader>2 :2wincmd W<CR>
-noremap <silent> <Leader>3 :3wincmd W<CR>
-noremap <silent> <Leader>4 :4wincmd W<CR>
-noremap <silent> <Leader>5 :5wincmd W<CR>
-noremap <silent> <Leader>6 :6wincmd W<CR>
-noremap <silent> <Leader>7 :7wincmd W<CR>
-noremap <silent> <Leader>8 :8wincmd W<CR>
-noremap <silent> <Leader>9 :9wincmd W<CR>
-" paste in insert mode
-inoremap <C-v> <Esc>pa
-
-" easyclip
-let g:EasyClipUseSubstituteDefaults = 1
-
-" Y yanks till the end of line
+noremap <silent> <leader>ww :Windows<cr>
+noremap <silent> <leader>pf :GFiles<cr>
+noremap <silent> <leader>ff :Files<cr>
+noremap <silent> <leader>sa :FZF -x ~<cr>
+noremap <silent> <leader>sp :Ag<cr>
+noremap <silent> <leader>ss :BLines<cr>
+noremap <silent> <leader>s: :History:<cr>
+noremap <silent> <leader>sc :History:<cr>
+noremap <silent> <leader>s/ :History/<cr>
+noremap <silent> <leader>fr :History<cr>
+noremap <silent> <leader>fR :tabe<cr>:History<cr>
+noremap <silent> <leader>as :Snippets<cr>
+noremap <silent> <leader>hc :Commands<cr>
+noremap <silent> <leader><tab> :b#<cr>
 noremap Y y$
-" g{n} for tab switch
-noremap g1 1gt
-noremap g2 2gt
-noremap g3 3gt
-noremap g4 4gt
-noremap g5 5gt
-noremap g6 6gt
-noremap g7 7gt
-noremap g8 8gt
-noremap g9 9gt
-" M-{n} for tab switch
-noremap <M-1> 1gt
-noremap <M-2> 2gt
-noremap <M-3> 3gt
-noremap <M-4> 4gt
-noremap <M-5> 5gt
-noremap <M-6> 6gt
-noremap <M-7> 7gt
-noremap <M-8> 8gt
-noremap <M-9> 9gt
-" faster scrolling
+vmap s S
+for i in range(1, 9)
+" <leader>{n} for window switching
+    execute "noremap <silent> <leader>" . i . " :" . i . "wincmd W<cr>"
+" g{n} and M-{n} for tab switch
+    execute "noremap g" . i . " " . i . "gt"
+    execute "noremap <m-" . i . "> " . i . "gt"
+endfor
 nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
 
 
 " tab completion
 inoremap <expr> <tab> pumvisible() ? deoplete#close_popup() : "\<tab>"
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+inoremap <silent> <cr> <C-r>=<SID>my_cr_function()<cr>
 function! s:my_cr_function() abort
-	return "\<CR>"
+	return "\<cr>"
 endfunction
 let g:UltiSnipsExpandTrigger="nil"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 
-noremap <silent> <Leader>au :MundoToggle<CR>
-
-
-" langs
-" typescript
-let g:nvim_typescript#type_info_on_hold=1
-let g:nvim_typescript#signature_complete=1
-" elm
-let g:elm_format_autosave = 1
-
-
-" autocmds
-augroup my_augroup
 " comments
-    autocmd BufEnter * silent! set formatoptions-=cro
+autocmd BufEnter * silent! set formatoptions-=cro
 " autochdir
-    autocmd BufEnter * silent! lcd %:p:h
+autocmd BufEnter * silent! lcd %:p:h
 " save buffers on focus loss
-    autocmd FocusLost * silent! wa
-" typescript
-    autocmd FileType typescript noremap <buffer> K :TSDoc<CR>
-	autocmd FileType typescript noremap <buffer> <M-CR> :TSImport<CR>
-	autocmd FileType typescript noremap <buffer> <C-b> :TSDef<CR>
-	autocmd FileType typescript noremap <buffer> <C-S-b> :TSTypeDef<CR>
-" elm
-    autocmd FileType elm nmap <buffer> K :ElmShowDocs<CR>
-augroup END
-" haskell
-let g:necoghc_enable_detailed_browse = 1
+autocmd FocusLost * silent! wa
 
 
-" vimfiler
-noremap <Leader>ft :VimFilerBufferDir -explorer<CR>
-noremap <Leader>pt :VimFiler -explorer<CR>
 " use this function to toggle vimfiler
 function! s:vimfiler_toggle()
   if &filetype == 'vimfiler'
@@ -222,14 +174,12 @@ function! s:vimfiler_toggle()
     let t:vimfiler_buffer = @%
   endif
 endfunction
-
 " make vimfiler buffer behave
 function! s:vimfiler_buffer_au()
   setlocal nobuflisted
   setlocal colorcolumn=
 endfunction
 autocmd FileType vimfiler call s:vimfiler_buffer_au()
-
 let g:vimfiler_as_default_explorer = 1
 let g:vimfiler_ignore_pattern = []
 let g:vimfiler_safe_mode_by_default = 0
@@ -237,3 +187,33 @@ let g:vimfiler_tree_leaf_icon = ' '
 let g:vimfiler_tree_opened_icon = '▾'
 let g:vimfiler_tree_closed_icon = '▸'
 let g:vimfiler_enable_auto_cd = 1
+
+
+" easyclip
+let g:EasyClipUseSubstituteDefaults = 1
+let g:EasyClipUseCutDefaults = 0
+nnoremap d "_d
+xnoremap d "_d
+nnoremap dd "_dd
+nnoremap D "_D
+nmap <leader>d <Plug>MoveMotionPlug
+xmap <leader>d <Plug>MoveMotionXPlug
+nmap <leader>dd <Plug>MoveMotionLinePlug
+nmap <leader>D <Plug>MoveMotionEndOfLinePlug
+
+
+" langs
+" typescript
+let g:nvim_typescript#type_info_on_hold=1
+let g:nvim_typescript#signature_complete=1
+autocmd FileType typescript noremap <buffer> K :TSDoc<cr>
+autocmd FileType typescript noremap <buffer> <M-cr> :TSImport<cr>
+autocmd FileType typescript noremap <buffer> <C-b> :TSDef<cr>
+autocmd FileType typescript noremap <buffer> <C-S-b> :TSTypeDef<cr>
+" elm
+let g:elm_format_autosave = 1
+autocmd FileType elm nmap <buffer> K :ElmShowDocs<cr>
+" haskell
+let g:necoghc_enable_detailed_browse = 1
+au FileType haskell nnoremap <buffer> <silent> ,t :GhcModType<cr> 
+au FileType haskell nnoremap <buffer> <silent> ,c :GhcModTypeClear<cr> 
