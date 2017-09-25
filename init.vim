@@ -9,6 +9,7 @@ Plug 'jreybert/vimagit'
 Plug 'bling/vim-airline'
 Plug 'morhetz/gruvbox'
 " syntax
+" Plug 'vim-syntastic/syntastic'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
 Plug 'sirver/ultisnips'
@@ -32,6 +33,10 @@ Plug 'eagletmt/ghcmod-vim'
 " org-mode
 Plug 'jceb/vim-orgmode'
 Plug 'tpope/vim-speeddating'
+" python
+Plug 'python-mode/python-mode'
+" c++
+Plug 'JBakamovic/yavide'
 call plug#end()
 
 let g:echodoc_enable_at_startup = 1
@@ -93,6 +98,7 @@ noremap <silent> <leader>vd :e ~/.config/nvim/init.vim<cr>
 noremap <silent> <leader>vs :so $MYVIMRC<cr>
 noremap <silent> <leader>vi :PlugInstall<cr>
 noremap <silent> <leader>vp :so $MYVIMRC<cr>:PlugInstall<cr>
+noremap <silent> <leader>vu :PlugUpdate<cr>
 noremap <silent> <leader>fD :call delete(expand('%'))<cr>:bdelete!<cr>
 noremap <silent> <leader>bd :call :bdelete!<cr>
 noremap <silent> <M-h> :bprevious<cr>
@@ -109,7 +115,7 @@ noremap <leader>pt :VimFiler -explorer<cr>
 noremap <leader>r :reg<cr>
 noremap <leader>hb :map 
 " paste in insert mode
-inoremap <C-v> <C-r>*
+inoremap <C-v> <C-r>+
 " fzf
 let g:fzf_layout = { 'down': '~30%' }
 " let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ node_modules/ elm-stuff/ -l -g ""'
@@ -139,6 +145,7 @@ for i in range(1, 9)
 endfor
 nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
+nnoremap <cr> i<cr><esc>
 
 
 " tab completion
@@ -158,6 +165,10 @@ autocmd BufEnter * silent! set formatoptions-=cro
 autocmd BufEnter * silent! lcd %:p:h
 " save buffers on focus loss
 autocmd FocusLost * silent! wa
+" highlight symbol under CursorMoved
+autocmd CursorMoved * exe exists("HlUnderCursor")?HlUnderCursor?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none':""
+nnoremap <silent> <leader>th :exe "let HlUnderCursor=exists(\"HlUnderCursor\")?HlUnderCursor*-1+1:1"<CR>
+
 
 
 " use this function to toggle vimfiler
@@ -215,5 +226,5 @@ let g:elm_format_autosave = 1
 autocmd FileType elm nmap <buffer> K :ElmShowDocs<cr>
 " haskell
 let g:necoghc_enable_detailed_browse = 1
-au FileType haskell nnoremap <buffer> <silent> ,t :GhcModType<cr> 
+au FileType haskell nnoremap <buffer> <silent> ,t :w<cr>:GhcModType<cr> 
 au FileType haskell nnoremap <buffer> <silent> ,c :GhcModTypeClear<cr> 
