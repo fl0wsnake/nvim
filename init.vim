@@ -9,6 +9,7 @@ Plug 'jreybert/vimagit'
 Plug 'bling/vim-airline'
 Plug 'morhetz/gruvbox'
 " syntax
+Plug 'Shougo/echodoc.vim'
 " Plug 'vim-syntastic/syntastic'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
@@ -24,7 +25,7 @@ Plug 'pangloss/vim-javascript'
 " ts
 Plug 'mhartington/nvim-typescript'
 Plug 'leafgarland/typescript-vim'
-" elm 
+" elm
 Plug 'pbogut/deoplete-elm'
 Plug 'ElmCast/elm-vim'
 " haskell
@@ -39,30 +40,25 @@ Plug 'python-mode/python-mode'
 Plug 'JBakamovic/yavide'
 call plug#end()
 
-let g:echodoc_enable_at_startup = 1
-let g:deoplete#enable_at_startup = 1
 
-" interface
 set noswapfile
 set ignorecase
 set updatetime=250
 set shortmess+=c
 set completeopt-=preview
 set completeopt+=noinsert
-set nocursorline
+set cursorline
 set nocursorcolumn
 set lazyredraw
 set nohlsearch
 set helpheight=99999
+let g:deoplete#enable_at_startup = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#tabline#show_tabs = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
-" set clipboard=unnamed
 set clipboard=unnamedplus
-" set clipboard=unnamed,unnamedplus
 set noshowmode
-set cmdheight=2 " for echodoc prompts
 set hidden
 syntax on
 colorscheme gruvbox
@@ -107,13 +103,13 @@ noremap <silent> <leader>gs :MagitOnly<cr>
 nnoremap <silent> <A-j> :m .+1<cr>
 nnoremap <silent> <A-k> :m .-2<cr>
 nnoremap <silent> <A-h> :bnext<cr>
-nnoremap <silent> <A-l> :bprevious<cr> 
-nnoremap <silent> <leader>V ggvG$<cr> 
+nnoremap <silent> <A-l> :bprevious<cr>
+nnoremap <silent> <leader>V ggvG$<cr>
 noremap <silent> <leader>au :MundoToggle<cr>
 noremap <leader>ft :VimFilerBufferDir -explorer<cr>
 noremap <leader>pt :VimFiler -explorer<cr>
 noremap <leader>r :reg<cr>
-noremap <leader>hb :map 
+noremap <leader>hb :map
 " paste in insert mode
 inoremap <C-v> <C-r>+
 " fzf
@@ -137,9 +133,9 @@ noremap <silent> <leader><tab> :b#<cr>
 noremap Y y$
 vmap s S
 for i in range(1, 9)
-" <leader>{n} for window switching
+    " <leader>{n} for window switching
     execute "noremap <silent> <leader>" . i . " :" . i . "wincmd W<cr>"
-" g{n} and M-{n} for tab switch
+    " g{n} and M-{n} for tab switch
     execute "noremap g" . i . " " . i . "gt"
     execute "noremap <m-" . i . "> " . i . "gt"
 endfor
@@ -152,43 +148,45 @@ nnoremap <cr> i<cr><esc>
 inoremap <expr> <tab> pumvisible() ? deoplete#close_popup() : "\<tab>"
 inoremap <silent> <cr> <C-r>=<SID>my_cr_function()<cr>
 function! s:my_cr_function() abort
-	return "\<cr>"
+    return "\<cr>"
 endfunction
 let g:UltiSnipsExpandTrigger="nil"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 
-" comments
+" no comments formatting
 autocmd BufEnter * silent! set formatoptions-=cro
 " autochdir
 autocmd BufEnter * silent! lcd %:p:h
-" save buffers on focus loss
+" save buffers
 autocmd FocusLost * silent! wa
 " highlight symbol under CursorMoved
 autocmd CursorMoved * exe exists("HlUnderCursor")?HlUnderCursor?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none':""
 nnoremap <silent> <leader>th :exe "let HlUnderCursor=exists(\"HlUnderCursor\")?HlUnderCursor*-1+1:1"<CR>
+" strip trailing whitespaces
+autocmd BufWritePre * :%s/\s\+$//e
 
 
 
 " use this function to toggle vimfiler
 function! s:vimfiler_toggle()
-  if &filetype == 'vimfiler'
-    execute 'silent! buffer #'
     if &filetype == 'vimfiler'
-      execute 'enew'
+        execute 'silent! buffer #'
+        if &filetype == 'vimfiler'
+            execute 'enew'
+        endif
+    elseif exists('t:vimfiler_buffer') && bufexists(t:vimfiler_buffer)
+        execute 'buffer ' . t:vimfiler_buffer
+    else
+        execute 'VimFilerCreate'
+        let t:vimfiler_buffer = @%
     endif
-  elseif exists('t:vimfiler_buffer') && bufexists(t:vimfiler_buffer)
-    execute 'buffer ' . t:vimfiler_buffer
-  else
-    execute 'VimFilerCreate'
-    let t:vimfiler_buffer = @%
-  endif
 endfunction
 " make vimfiler buffer behave
 function! s:vimfiler_buffer_au()
-  setlocal nobuflisted
-  setlocal colorcolumn=
+    setlocal nobuflisted
+    setlocal colorcolumn=
 endfunction
 autocmd FileType vimfiler call s:vimfiler_buffer_au()
 let g:vimfiler_as_default_explorer = 1
@@ -226,5 +224,5 @@ let g:elm_format_autosave = 1
 autocmd FileType elm nmap <buffer> K :ElmShowDocs<cr>
 " haskell
 let g:necoghc_enable_detailed_browse = 1
-au FileType haskell nnoremap <buffer> <silent> ,t :w<cr>:GhcModType<cr> 
-au FileType haskell nnoremap <buffer> <silent> ,c :GhcModTypeClear<cr> 
+au FileType haskell nnoremap <buffer> <silent> ,t :w<cr>:GhcModType<cr>
+au FileType haskell nnoremap <buffer> <silent> ,c :GhcModTypeClear<cr>
