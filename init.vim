@@ -3,8 +3,6 @@ Plug 'neomake/neomake'
 Plug 'Shougo/vimproc', {'do': 'make'}
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'Shougo/vimfiler'
-Plug 'Shougo/unite.vim'
 Plug 'jreybert/vimagit'
 Plug 'bling/vim-airline'
 Plug 'morhetz/gruvbox'
@@ -20,6 +18,10 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'simnalamburt/vim-mundo'
 Plug 'tpope/vim-repeat'
 Plug 'svermeulen/vim-easyclip'
+" file explorer
+" Plug 'Shougo/vimfiler'
+" Plug 'Shougo/unite.vim'
+Plug 'scrooloose/nerdtree'
 " js
 Plug 'pangloss/vim-javascript'
 " ts
@@ -38,6 +40,10 @@ Plug 'tpope/vim-speeddating'
 Plug 'python-mode/python-mode'
 " c++
 Plug 'JBakamovic/yavide'
+" i3
+Plug 'PotatoesMaster/i3-vim-syntax'
+" xml
+Plug 'othree/xml.vim'
 call plug#end()
 
 
@@ -52,11 +58,6 @@ set nocursorcolumn
 set lazyredraw
 set nohlsearch
 set helpheight=99999
-let g:deoplete#enable_at_startup = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#show_buffers = 0
-let g:airline#extensions#tabline#show_tabs = 1
-let g:airline#extensions#tabline#fnamemod = ':t'
 set clipboard=unnamedplus
 set noshowmode
 set hidden
@@ -76,6 +77,20 @@ set scrolloff=3
 let mapleader="\<Space>"
 let maplocalleader=","
 
+" deoplete
+let g:deoplete#enable_at_startup = 1
+
+" airline
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#show_buffers = 0
+let g:airline#extensions#tabline#show_tabs = 1
+let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline_section_c = airline#section#create(['%{getcwd()}', '/', 'file'])
+let g:airline#extensions#tabline#tab_min_count = 2
+
+" fzf
+let g:fzf_layout = { 'down': '~30%' }
+
 
 " keymaps
 noremap <silent> <leader>wd :q<cr>
@@ -85,6 +100,7 @@ noremap <silent> <leader>wt :tabe<cr>
 noremap <silent> <leader>wm :only<cr>
 noremap <silent> <leader>fs :w<cr>
 noremap <silent> <leader>fS :wa<cr>
+noremap <silent> <leader>fu :set undoreload=0<cr>:edit<cr>
 noremap <silent> <leader>fe :e<cr>
 noremap <silent> <leader>qq :qa<cr>
 noremap <silent> <leader>qQ :qa!<cr>
@@ -106,15 +122,11 @@ nnoremap <silent> <A-h> :bnext<cr>
 nnoremap <silent> <A-l> :bprevious<cr>
 nnoremap <silent> <leader>V ggvG$<cr>
 noremap <silent> <leader>au :MundoToggle<cr>
-noremap <leader>ft :VimFilerBufferDir -explorer<cr>
-noremap <leader>pt :VimFiler -explorer<cr>
+noremap <leader>ft :VimFiler<cr>
+noremap <leader>pt :VimFilerBufferDir<cr>
 noremap <leader>r :reg<cr>
 noremap <leader>hb :map
-" paste in insert mode
 inoremap <C-v> <C-r>+
-" fzf
-let g:fzf_layout = { 'down': '~30%' }
-" let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ node_modules/ elm-stuff/ -l -g ""'
 let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ -l -g ""'
 noremap <silent> <leader>ww :Windows<cr>
 noremap <silent> <leader>pf :GFiles<cr>
@@ -169,26 +181,26 @@ autocmd BufWritePre * :%s/\s\+$//e
 
 
 
-" use this function to toggle vimfiler
-function! s:vimfiler_toggle()
-    if &filetype == 'vimfiler'
-        execute 'silent! buffer #'
-        if &filetype == 'vimfiler'
-            execute 'enew'
-        endif
-    elseif exists('t:vimfiler_buffer') && bufexists(t:vimfiler_buffer)
-        execute 'buffer ' . t:vimfiler_buffer
-    else
-        execute 'VimFilerCreate'
-        let t:vimfiler_buffer = @%
-    endif
-endfunction
-" make vimfiler buffer behave
-function! s:vimfiler_buffer_au()
-    setlocal nobuflisted
-    setlocal colorcolumn=
-endfunction
-autocmd FileType vimfiler call s:vimfiler_buffer_au()
+" vimfiler
+" function! s:vimfiler_toggle()
+"     if &filetype == 'vimfiler'
+"         execute 'silent! buffer #'
+"         if &filetype == 'vimfiler'
+"             execute 'enew'
+"         endif
+"     elseif exists('t:vimfiler_buffer') && bufexists(t:vimfiler_buffer)
+"         execute 'buffer ' . t:vimfiler_buffer
+"     else
+"         execute 'VimFilerCreate'
+"         let t:vimfiler_buffer = @%
+"     endif
+" endfunction
+" " make vimfiler buffer behave
+" function! s:vimfiler_buffer_au()
+"     setlocal nobuflisted
+"     setlocal colorcolumn=
+" endfunction
+" autocmd FileType vimfiler call s:vimfiler_buffer_au()
 let g:vimfiler_as_default_explorer = 1
 let g:vimfiler_ignore_pattern = []
 let g:vimfiler_safe_mode_by_default = 0
