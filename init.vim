@@ -19,8 +19,6 @@ Plug 'simnalamburt/vim-mundo'
 Plug 'tpope/vim-repeat'
 Plug 'svermeulen/vim-easyclip'
 " file explorer
-" Plug 'Shougo/vimfiler'
-" Plug 'Shougo/unite.vim'
 Plug 'scrooloose/nerdtree'
 " js
 Plug 'pangloss/vim-javascript'
@@ -122,8 +120,8 @@ nnoremap <silent> <A-h> :bnext<cr>
 nnoremap <silent> <A-l> :bprevious<cr>
 nnoremap <silent> <leader>V ggvG$<cr>
 noremap <silent> <leader>au :MundoToggle<cr>
-noremap <leader>ft :VimFiler<cr>
-noremap <leader>pt :VimFilerBufferDir<cr>
+noremap <leader>ft :NERDTree<cr>
+noremap <leader>pt :NERDTree %<cr>
 noremap <leader>r :reg<cr>
 noremap <leader>hb :map
 inoremap <C-v> <C-r>+
@@ -180,36 +178,6 @@ nnoremap <silent> <leader>th :exe "let HlUnderCursor=exists(\"HlUnderCursor\")?H
 autocmd BufWritePre * :%s/\s\+$//e
 
 
-
-" vimfiler
-" function! s:vimfiler_toggle()
-"     if &filetype == 'vimfiler'
-"         execute 'silent! buffer #'
-"         if &filetype == 'vimfiler'
-"             execute 'enew'
-"         endif
-"     elseif exists('t:vimfiler_buffer') && bufexists(t:vimfiler_buffer)
-"         execute 'buffer ' . t:vimfiler_buffer
-"     else
-"         execute 'VimFilerCreate'
-"         let t:vimfiler_buffer = @%
-"     endif
-" endfunction
-" " make vimfiler buffer behave
-" function! s:vimfiler_buffer_au()
-"     setlocal nobuflisted
-"     setlocal colorcolumn=
-" endfunction
-" autocmd FileType vimfiler call s:vimfiler_buffer_au()
-let g:vimfiler_as_default_explorer = 1
-let g:vimfiler_ignore_pattern = []
-let g:vimfiler_safe_mode_by_default = 0
-let g:vimfiler_tree_leaf_icon = ' '
-let g:vimfiler_tree_opened_icon = '▾'
-let g:vimfiler_tree_closed_icon = '▸'
-let g:vimfiler_enable_auto_cd = 1
-
-
 " easyclip
 let g:EasyClipUseSubstituteDefaults = 1
 let g:EasyClipUseCutDefaults = 0
@@ -221,6 +189,12 @@ nmap <leader>d <Plug>MoveMotionPlug
 xmap <leader>d <Plug>MoveMotionXPlug
 nmap <leader>dd <Plug>MoveMotionLinePlug
 nmap <leader>D <Plug>MoveMotionEndOfLinePlug
+
+
+" NERDTree
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | only | endif
+let NERDTreeShowHidden=1
 
 
 " langs
