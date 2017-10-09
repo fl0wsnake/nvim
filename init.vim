@@ -42,8 +42,9 @@ Plug 'JBakamovic/yavide'
 Plug 'PotatoesMaster/i3-vim-syntax'
 " xml
 Plug 'othree/xml.vim'
+" LaTeX
+Plug 'lervag/vimtex'
 call plug#end()
-
 
 set noswapfile
 set ignorecase
@@ -70,7 +71,6 @@ set number
 set relativenumber
 set scrolloff=3
 
-
 " leaders
 let mapleader="\<Space>"
 let maplocalleader=","
@@ -86,9 +86,15 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 let g:airline_section_c = airline#section#create(['%{getcwd()}', '/', 'file'])
 let g:airline#extensions#tabline#tab_min_count = 2
 
-" fzf
-let g:fzf_layout = { 'down': '~30%' }
+" NERDTree
+autocmd StdinReadPre * let s:std_in=1
+let NERDTreeShowHidden=1
 
+" fzf
+let $FZF_DEFAULT_COMMAND = 'ag --hidden -l -g ""'
+
+" content if no arguments supplied
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | only | endif
 
 " keymaps
 noremap <silent> <leader>wd :q<cr>
@@ -124,8 +130,7 @@ noremap <leader>ft :NERDTree<cr>
 noremap <leader>pt :NERDTree %<cr>
 noremap <leader>r :reg<cr>
 noremap <leader>hb :map
-inoremap <C-v> <C-r>+
-let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git/ -l -g ""'
+" inoremap <C-S-v> <C-r>+
 noremap <silent> <leader>ww :Windows<cr>
 noremap <silent> <leader>pf :GFiles<cr>
 noremap <silent> <leader>ff :Files<cr>
@@ -141,7 +146,6 @@ noremap <silent> <leader>as :Snippets<cr>
 noremap <silent> <leader>hc :Commands<cr>
 noremap <silent> <leader><tab> :b#<cr>
 noremap Y y$
-vmap s S
 for i in range(1, 9)
     " <leader>{n} for window switching
     execute "noremap <silent> <leader>" . i . " :" . i . "wincmd W<cr>"
@@ -153,7 +157,6 @@ nnoremap <C-e> 2<C-e>
 nnoremap <C-y> 2<C-y>
 nnoremap <cr> i<cr><esc>
 
-
 " tab completion
 inoremap <expr> <tab> pumvisible() ? deoplete#close_popup() : "\<tab>"
 inoremap <silent> <cr> <C-r>=<SID>my_cr_function()<cr>
@@ -164,19 +167,20 @@ let g:UltiSnipsExpandTrigger="nil"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
-
-" no comments formatting
+" no comment formatting
 autocmd BufEnter * silent! set formatoptions-=cro
 " autochdir
 autocmd BufEnter * silent! lcd %:p:h
 " save buffers
-autocmd FocusLost * silent! wa
-" highlight symbol under CursorMoved
-autocmd CursorMoved * exe exists("HlUnderCursor")?HlUnderCursor?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none':""
-nnoremap <silent> <leader>th :exe "let HlUnderCursor=exists(\"HlUnderCursor\")?HlUnderCursor*-1+1:1"<CR>
+let AutoSaveMode = 1
+autocmd FocusLost * exec exists("AutoSaveMode")?AutoSaveMode?"wa":"":""
+nnoremap <silent> <leader>ts :exe "let AutoSaveMode=AutoSaveMode*-1+1"<CR>
+" highlight symbol under cursor
+let HlUnderCursorMode = 0
+autocmd CursorHold * exe HlUnderCursorMode?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none'
+nnoremap <silent> <leader>th :exe "let HlUnderCursorMode=HlUnderCursorMode*-1+1"<CR>
 " strip trailing whitespaces
 autocmd BufWritePre * :%s/\s\+$//e
-
 
 " easyclip
 let g:EasyClipUseSubstituteDefaults = 1
@@ -185,17 +189,14 @@ nnoremap d "_d
 xnoremap d "_d
 nnoremap dd "_dd
 nnoremap D "_D
-nmap <leader>d <Plug>MoveMotionPlug
-xmap <leader>d <Plug>MoveMotionXPlug
-nmap <leader>dd <Plug>MoveMotionLinePlug
-nmap <leader>D <Plug>MoveMotionEndOfLinePlug
+nmap <leader>d <plug>MoveMotionPlug
+xmap <leader>d <plug>MoveMotionXPlug
+nmap <leader>dd <plug>MoveMotionLinePlug
+nmap <leader>D <plug>MoveMotionEndOfLinePlug
+vmap s S
 
-
-" NERDTree
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | only | endif
-let NERDTreeShowHidden=1
-
+" transparency
+hi Normal guibg=NONE ctermbg=NONE
 
 " langs
 " typescript
