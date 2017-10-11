@@ -8,7 +8,6 @@ Plug 'bling/vim-airline'
 Plug 'morhetz/gruvbox'
 " syntax
 Plug 'Shougo/echodoc.vim'
-" Plug 'vim-syntastic/syntastic'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
 Plug 'sirver/ultisnips'
@@ -44,6 +43,7 @@ Plug 'PotatoesMaster/i3-vim-syntax'
 Plug 'othree/xml.vim'
 " LaTeX
 Plug 'lervag/vimtex'
+Plug 'xuhdev/vim-latex-live-preview'
 call plug#end()
 
 set noswapfile
@@ -87,14 +87,14 @@ let g:airline_section_c = airline#section#create(['%{getcwd()}', '/', 'file'])
 let g:airline#extensions#tabline#tab_min_count = 2
 
 " NERDTree
-autocmd StdinReadPre * let s:std_in=1
+au StdinReadPre * let s:std_in=1
 let NERDTreeShowHidden=1
 
 " fzf
 let $FZF_DEFAULT_COMMAND = 'ag --hidden -l -g ""'
 
 " content if no arguments supplied
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | only | endif
+au VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | only | endif
 
 " keymaps
 noremap <silent> <leader>wd :q<cr>
@@ -168,19 +168,28 @@ let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " no comment formatting
-autocmd BufEnter * silent! set formatoptions-=cro
-" autochdir
-autocmd BufEnter * silent! lcd %:p:h
-" save buffers
-let AutoSaveMode = 1
-autocmd FocusLost * exec exists("AutoSaveMode")?AutoSaveMode?"wa":"":""
-nnoremap <silent> <leader>ts :exe "let AutoSaveMode=AutoSaveMode*-1+1"<CR>
-" highlight symbol under cursor
-let HlUnderCursorMode = 0
-autocmd CursorHold * exe HlUnderCursorMode?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none'
-nnoremap <silent> <leader>th :exe "let HlUnderCursorMode=HlUnderCursorMode*-1+1"<CR>
+au BufEnter * silent! set formatoptions-=cro
 " strip trailing whitespaces
-autocmd BufWritePre * :%s/\s\+$//e
+au BufWritePre * :%s/\s\+$//e
+
+" modes
+function! ToggleVar(var, message)
+    if a:var
+        echo a:message.' OFF'
+        return 0
+    else
+        echo a:message.' ON'
+        return 1
+    endif
+endfunction
+" autosave buffers mode
+let AutoSaveMode = 1
+au FocusLost * exec AutoSaveMode?"wa":""
+nnoremap <silent> <leader>ts :let AutoSaveMode=ToggleVar(AutoSaveMode, 'autosave buffers mode')<CR>
+" highlight symbol under cursor mode
+let HlUnderCursorMode = 0
+au CursorHold * exe HlUnderCursorMode?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none'
+nnoremap <silent> <leader>th :let HlUnderCursorMode=ToggleVar(HlUnderCursorMode, 'highlight symbol under cursor mode')<CR>
 
 " easyclip
 let g:EasyClipUseSubstituteDefaults = 1
@@ -195,6 +204,10 @@ nmap <leader>dd <plug>MoveMotionLinePlug
 nmap <leader>D <plug>MoveMotionEndOfLinePlug
 vmap s S
 
+" TeX
+let g:livepreview_previewer = 'zathura'
+au FileType tex,latex noremap <buffer> ,p :LLPStartPreview<cr>
+
 " transparency
 hi Normal guibg=NONE ctermbg=NONE
 
@@ -202,13 +215,13 @@ hi Normal guibg=NONE ctermbg=NONE
 " typescript
 let g:nvim_typescript#type_info_on_hold=1
 let g:nvim_typescript#signature_complete=1
-autocmd FileType typescript noremap <buffer> K :TSDoc<cr>
-autocmd FileType typescript noremap <buffer> <M-cr> :TSImport<cr>
-autocmd FileType typescript noremap <buffer> <C-b> :TSDef<cr>
-autocmd FileType typescript noremap <buffer> <C-S-b> :TSTypeDef<cr>
+au FileType typescript noremap <buffer> K :TSDoc<cr>
+au FileType typescript noremap <buffer> <M-cr> :TSImport<cr>
+au FileType typescript noremap <buffer> <C-b> :TSDef<cr>
+au FileType typescript noremap <buffer> <C-S-b> :TSTypeDef<cr>
 " elm
 let g:elm_format_autosave = 1
-autocmd FileType elm nmap <buffer> K :ElmShowDocs<cr>
+au FileType elm nmap <buffer> K :ElmShowDocs<cr>
 " haskell
 let g:necoghc_enable_detailed_browse = 1
 au FileType haskell nnoremap <buffer> <silent> ,t :w<cr>:GhcModType<cr>
