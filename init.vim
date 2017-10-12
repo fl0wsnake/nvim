@@ -138,7 +138,7 @@ nnoremap <cr> i<cr><esc>
 
 " completion tab behaviour
 inoremap <expr> <tab> pumvisible() ? deoplete#close_popup() : "\<tab>"
-let g:UltiSnipsExpandTrigger="nil"
+let g:UltiSnipsExpandTrigger='<C-P>'
 " completion enter behaviour
 inoremap <silent> <cr> <C-r>=<SID>my_cr_function()<cr>
 function! s:my_cr_function() abort
