@@ -19,6 +19,7 @@ Plug 'tpope/vim-repeat'
 Plug 'svermeulen/vim-easyclip'
 " file explorer
 Plug 'scrooloose/nerdtree'
+Plug 'dbakker/vim-projectroot'
 " js
 Plug 'pangloss/vim-javascript'
 " ts
@@ -106,10 +107,11 @@ nnoremap <silent> <A-h> :bnext<cr>
 nnoremap <silent> <A-l> :bprevious<cr>
 nnoremap <silent> <leader>V ggvG$<cr>
 noremap <silent> <leader>au :MundoToggle<cr>
-noremap <leader>ft :NERDTree<cr>
-noremap <leader>pt :NERDTree %<cr>
-noremap <leader>r :reg<cr>
-noremap <leader>hb :map
+noremap <silent> <leader>ft :NERDTreeFind<cr>
+noremap <silent> <leader>pt :ProjectRootExe NERDTreeFind<cr>
+noremap <silent> <leader>r :reg<cr>
+noremap <silent> <leader>hb :map
+noremap <silent> <leader>hh :tab h
 noremap <silent> <leader>ww :Windows<cr>
 noremap <silent> <leader>pf :GFiles<cr>
 noremap <silent> <leader>ff :Files<cr>
@@ -150,14 +152,13 @@ endfunction
 au BufEnter * silent! set formatoptions-=cro
 " strip trailing whitespaces
 au BufWritePre * :%s/\s\+$//e
-" content if no arguments supplied
-" au StdinReadPre * let s:std_in=1
-" au VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | only | endif
 " transparency
 hi Normal guibg=NONE ctermbg=NONE
-" scratch buffer instead of no name buffer if no arguments are supplied
+" content if no arguments supplied
 au VimEnter * if argc() == 0 | setlocal buftype=nofile | endif
-" au BufEnter * silent! exec @% == "" ? 'setlocal buftype=nofile' : ''
+
+" autochdir
+autocmd BufEnter * silent! lcd %:p:h
 
 " modes
 function! ToggleVar(var, message)
@@ -190,6 +191,7 @@ let g:airline_section_a = airline#section#create([])
 let g:airline_section_c = airline#section#create(['path'])
 let g:airline_section_z = airline#section#create([])
 " NERDTree
+let NERDTreeQuitOnOpen=1
 let NERDTreeMinimalUI=1
 let NERDTreeShowHidden=1
 " fzf
