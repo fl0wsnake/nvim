@@ -7,6 +7,7 @@ Plug 'jreybert/vimagit'
 Plug 'bling/vim-airline'
 Plug 'morhetz/gruvbox'
 " syntax
+Plug 'Chiel92/vim-autoformat'
 Plug 'Shougo/echodoc.vim'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
@@ -45,7 +46,19 @@ Plug 'othree/xml.vim'
 " LaTeX
 Plug 'lervag/vimtex'
 Plug 'xuhdev/vim-latex-live-preview'
+" markdown
+" Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+" notes
+Plug 'vimwiki/vimwiki'
 call plug#end()
+
+" set nocompatible
+" filetype plugin on
+" syntax on
+" set foldmethod=syntax
+let g:vimwiki_folding = 'expr'
+
 " sets
 set noswapfile
 set ignorecase
@@ -76,15 +89,15 @@ let mapleader="\<Space>"
 let maplocalleader=","
 
 " keymaps
+noremap <silent> <leader>at :pu=strftime('%D %H:%M')<cr>
 noremap <silent> <leader>bs :enew<cr>
-" noremap <silent> <leader>bs :Scratch<cr>:only<cr>
 noremap <silent> <leader>wd :q<cr>
 noremap <silent> <leader>wD :q!<cr>
 noremap <silent> <leader>wv :vsplit<cr>
 noremap <silent> <leader>wt :tabe<cr>
 noremap <silent> <leader>wm :only<cr>
 noremap <silent> <leader>fs :silent! w<cr>
-noremap <silent> <leader>fS :silent! :wa<cr>
+noremap <silent> <leader>fS :silent! wa<cr>
 noremap <silent> <leader>fu :set undoreload=0<cr>:e<cr>
 noremap <silent> <leader>fe :e<cr>
 noremap <silent> <leader>qq :qa<cr>
@@ -107,22 +120,9 @@ nnoremap <silent> <A-h> :bnext<cr>
 nnoremap <silent> <A-l> :bprevious<cr>
 nnoremap <silent> <leader>V ggvG$<cr>
 noremap <silent> <leader>au :MundoToggle<cr>
-noremap <silent> <leader>ft :NERDTreeFind<cr>
-noremap <silent> <leader>pt :ProjectRootExe NERDTreeFind<cr>
 noremap <silent> <leader>r :reg<cr>
 noremap <silent> <leader>hb :map
 noremap <silent> <leader>hh :tab h
-noremap <silent> <leader>ww :Windows<cr>
-noremap <silent> <leader>pf :GFiles<cr>
-noremap <silent> <leader>ff :Files<cr>
-noremap <silent> <leader>sa :FZF -x ~<cr>
-noremap <silent> <leader>sp :Ag<cr>
-noremap <silent> <leader>ss :BLines<cr>
-noremap <silent> <leader>s: :History:<cr>
-noremap <silent> <leader>sc :History:<cr>
-noremap <silent> <leader>s/ :History/<cr>
-noremap <silent> <leader>fr :History<cr>
-noremap <silent> <leader>fR :tabe<cr>:History<cr>
 noremap <silent> <leader>as :Snippets<cr>
 noremap <silent> <leader>hc :Commands<cr>
 noremap <silent> <leader><tab> :b#<cr>
@@ -156,9 +156,8 @@ au BufWritePre * :%s/\s\+$//e
 hi Normal guibg=NONE ctermbg=NONE
 " content if no arguments supplied
 au VimEnter * if argc() == 0 | setlocal buftype=nofile | endif
-
 " autochdir
-autocmd BufEnter * silent! lcd %:p:h
+set autochdir
 
 " modes
 function! ToggleVar(var, message)
@@ -170,14 +169,14 @@ function! ToggleVar(var, message)
         return 1
     endif
 endfunction
-" autosave buffers mode
+" autosave buffers on focus loss mode
 let AutoSaveMode = 1
-au FocusLost * silent! exec AutoSaveMode?"silent! wa":""
 nnoremap <silent> <leader>ts :let AutoSaveMode=ToggleVar(AutoSaveMode, 'autosave buffers mode')<CR>
+au FocusLost * silent! exec AutoSaveMode?"wa":""
 " highlight symbol under cursor mode
 let HlUnderCursorMode = 0
-au CursorHold * exe HlUnderCursorMode?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none'
 nnoremap <silent> <leader>th :let HlUnderCursorMode=ToggleVar(HlUnderCursorMode, 'highlight symbol under cursor mode')<CR>
+au CursorHold * exe HlUnderCursorMode?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none'
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
@@ -194,8 +193,22 @@ let g:airline_section_z = airline#section#create([])
 let NERDTreeQuitOnOpen=1
 let NERDTreeMinimalUI=1
 let NERDTreeShowHidden=1
+noremap <silent> <leader>ft :NERDTreeFind<cr>
+noremap <silent> <leader>pt :ProjectRootExe NERDTreeFind<cr>
 " fzf
 let $FZF_DEFAULT_COMMAND = 'ag --hidden -l -g ""'
+noremap <silent> <leader>ww :Windows!<cr>
+noremap <silent> <leader>pf :GFiles!<cr>
+noremap <silent> <leader>sf :Ag! .<cr>
+noremap <silent> <leader>ff :Files!<cr>
+noremap <silent> <leader>sa :FZF! -x ~<cr>
+noremap <silent> <leader>sp :Ag!<cr>
+noremap <silent> <leader>ss :BLines!<cr>
+noremap <silent> <leader>s: :History:!<cr>
+noremap <silent> <leader>sc :History:!<cr>
+noremap <silent> <leader>s/ :History/!<cr>
+noremap <silent> <leader>fr :History!<cr>
+noremap <silent> <leader>fR :tabe<cr>:History!<cr>
 " easyclip
 let g:EasyClipUseSubstituteDefaults = 1
 let g:EasyClipUseCutDefaults = 0
@@ -208,12 +221,22 @@ xmap <leader>d <plug>MoveMotionXPlug
 nmap <leader>dd <plug>MoveMotionLinePlug
 nmap <leader>D <plug>MoveMotionEndOfLinePlug
 vmap s S
-" TeX
-let g:livepreview_previewer = 'zathura'
-au FileType tex,latex noremap <buffer> ,p :LLPStartPreview<cr>
+" vimwiki
+au FileType vimwiki vmap <silent> ,u :s/ /_/g<cr>
+map <silent> <leader>ow <plug>VimwikiIndex
+map <silent> <leader>oW <plug>VimwikiTabIndex
+map <silent> <leader>os <plug>VimwikiUISelect
+map <silent> <leader>oi <plug>VimwikiDiaryIndex
+map <silent> <leader>oj <plug>VimwikiMakeDiaryNote
+map <silent> <leader>oJ <plug>VimwikiTabMakeDiaryNote
+map <silent> <leader>ot :e ~/Dropbox/vimwiki/todos.wiki<cr>
+map <silent> <leader>or <plug>VimwikiRenameLink
+let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki', 'path_html': '~/Dropbox/vimwiki/html', 'template_path': "~/Dropbox/vimwiki/templates"}]
 
 " langs
-" typescript
+" format
+au FileType javascript,sh au BufWritePre * :Autoformat
+" ts
 let g:nvim_typescript#type_info_on_hold=1
 let g:nvim_typescript#signature_complete=1
 au FileType typescript noremap <buffer> K :TSDoc<cr>
@@ -227,3 +250,6 @@ au FileType elm nmap <buffer> K :ElmShowDocs<cr>
 let g:necoghc_enable_detailed_browse = 1
 au FileType haskell nnoremap <buffer> <silent> ,t :w<cr>:GhcModType<cr>
 au FileType haskell nnoremap <buffer> <silent> ,c :GhcModTypeClear<cr>
+" TeX
+let g:livepreview_previewer = 'zathura'
+au FileType tex,latex noremap <buffer> ,p :LLPStartPreview<cr>
