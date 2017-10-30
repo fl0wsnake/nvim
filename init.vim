@@ -225,13 +225,13 @@ nnoremap <silent> <leader>ts :let AutoSaveMode=ToggleVar(AutoSaveMode, 'autosave
 au FocusLost * silent! exec AutoSaveMode?"wa":""
 " highlight symbol under cursor mode
 let HlUnderCursorMode = 0
-nnoremap <silent> <leader>th :let HlUnderCursorMode=ToggleVar(HlUnderCursorMode, 'highlight symbol under cursor mode')<CR>
+nnoremap <silent> <leader>th :let HlUnderCursorMode=ToggleVar(HlUnderCursorMode, 'symbol highlight mode')<CR>
 au CursorHold * exe HlUnderCursorMode?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none'
 " spellchecker mode
 set spellcapcheck=
 set spelllang=en_us
 au FileType text setl spell
-nnoremap <silent> <leader>tc :setl spell!<cr>
+nnoremap <silent> <leader>tc :call ToggleVar(&spell, 'spellchecker mode')<cr>:setl spell!<cr>
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
