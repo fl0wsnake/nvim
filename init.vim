@@ -6,6 +6,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'jreybert/vimagit'
 Plug 'bling/vim-airline'
 Plug 'morhetz/gruvbox'
+Plug 'tpope/vim-eunuch'
 " syntax
 Plug 'Chiel92/vim-autoformat'
 Plug 'Shougo/echodoc.vim'
@@ -18,9 +19,10 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'simnalamburt/vim-mundo'
 Plug 'tpope/vim-repeat'
 Plug 'svermeulen/vim-easyclip'
-" file explorer
+Plug 'vim-scripts/loremipsum'
 Plug 'scrooloose/nerdtree'
 Plug 'dbakker/vim-projectroot'
+Plug 'sk1418/HowMuch'
 " js
 Plug 'pangloss/vim-javascript'
 " ts
@@ -38,7 +40,7 @@ Plug 'tpope/vim-speeddating'
 " python
 Plug 'python-mode/python-mode'
 " c++
-Plug 'JBakamovic/yavide'
+Plug 'Rip-Rip/clang_complete'
 " i3
 Plug 'PotatoesMaster/i3-vim-syntax'
 " xml
@@ -47,17 +49,12 @@ Plug 'othree/xml.vim'
 Plug 'lervag/vimtex'
 Plug 'xuhdev/vim-latex-live-preview'
 " markdown
-" Plug 'godlygeek/tabular'
+Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
+Plug 'suan/vim-instant-markdown'
 " notes
 Plug 'vimwiki/vimwiki'
 call plug#end()
-
-" set nocompatible
-" filetype plugin on
-" syntax on
-" set foldmethod=syntax
-let g:vimwiki_folding = 'expr'
 
 " sets
 set noswapfile
@@ -89,17 +86,19 @@ let mapleader="\<Space>"
 let maplocalleader=","
 
 " keymaps
-noremap <silent> <leader>at :pu=strftime('%D %H:%M')<cr>
+noremap <silent> <leader>ad a<C-R>=strftime('%d/%m/%y')<cr><esc>
+noremap <silent> <leader>aD a<C-R>=strftime('%d/%m/%y %H:%M')<cr><esc>
+noremap <silent> <leader>al :Loremipsum<space>
 noremap <silent> <leader>bs :enew<cr>
 noremap <silent> <leader>wd :q<cr>
 noremap <silent> <leader>wD :q!<cr>
 noremap <silent> <leader>wv :vsplit<cr>
 noremap <silent> <leader>wt :tabe<cr>
 noremap <silent> <leader>wm :only<cr>
-noremap <silent> <leader>fs :silent! w<cr>
-noremap <silent> <leader>fS :silent! wa<cr>
+noremap <silent> <leader>fw :silent! w<cr>
+noremap <silent> <leader>fW :silent! wa<cr>
 noremap <silent> <leader>fu :set undoreload=0<cr>:e<cr>
-noremap <silent> <leader>fe :e<cr>
+noremap <silent> <leader>fe :e!<cr>
 noremap <silent> <leader>qq :qa<cr>
 noremap <silent> <leader>qQ :qa!<cr>
 noremap <silent> <leader>qs :wqa<cr>
@@ -109,8 +108,16 @@ noremap <silent> <leader>vs :so $MYVIMRC<cr>
 noremap <silent> <leader>vi :PlugInstall<cr>
 noremap <silent> <leader>vp :so $MYVIMRC<cr>:PlugInstall<cr>
 noremap <silent> <leader>vu :PlugUpdate<cr>
-noremap <silent> <leader>fD :call delete(expand('%'))<cr>:bdelete!<cr>
-noremap <silent> <leader>bd :call :bdelete!<cr>
+noremap <silent> <leader>fD :call DeleteFileAndBuffer()<cr>
+function DeleteFileAndBuffer()
+    if confirm('Delete buffer with file?', "&Yes\n&No", 0) == 1
+        call delete(expand('%'))
+        bdelete!
+    endif
+endfunction
+noremap <silent> <leader>fd :call delete(expand('%'))<cr>:set modified<cr>
+noremap <silent> <leader>bd :bdelete!<cr>
+noremap <silent> <leader>fm :Rename<space>
 noremap <silent> <M-h> :bprevious<cr>
 noremap <silent> <M-l> :bnext<cr>
 noremap <silent> <leader>gs :MagitOnly<cr>
@@ -127,6 +134,11 @@ noremap <silent> <leader>as :Snippets<cr>
 noremap <silent> <leader>hc :Commands<cr>
 noremap <silent> <leader><tab> :b#<cr>
 noremap Y y$
+noremap <silent> k gk
+noremap <silent> j gj
+noremap <silent> 0 g0
+noremap <silent> $ g$
+noremap <silent> ^ g^
 for i in range(1, 9)
     " <leader>{n} for window switching
     execute "noremap <silent> <leader>" . i . " :" . i . "wincmd W<cr>"
@@ -147,6 +159,42 @@ function! s:my_cr_function() abort
     return deoplete#mappings#smart_close_popup() . "\<CR>"
 endfunction
 
+" translator
+let g:trans_dir = "~/apps/trans/"
+function! Trans(if_delete)
+    exe system("mkdir -p " . g:trans_dir)
+    let l:word = tolower(expand("<cword>"))
+    let l:word_path = g:trans_dir . l:word . ".txt"
+    if !filereadable(expand(l:word_path)) || a:if_delete
+        if system("command -v trans") == ''
+            echo("No trans executeble found.")
+        else
+            exe system("trans -no-ansi " . l:word . ">" . l:word_path)
+        endif
+    endif
+    exe "e" fnameescape(l:word_path) | setl buftype=nowrite
+endfunction
+noremap <silent> <leader>at :exe Trans(0)<cr>
+noremap <silent> <leader>aT :exe Trans(1)<cr>
+
+" lyrics
+let g:lyrics_dir = "~/apps/lyrics/"
+function! Lyrics(if_delete)
+    exe system("mkdir -p " . g:lyrics_dir)
+    let l:song_name = substitute(tolower(getline('.')), " ", "_", "g")
+    let l:song_path = g:lyrics_dir . l:song_name . ".txt"
+    if !filereadable(expand(l:song_path)) || a:if_delete
+        if system("command -v clyrics") == ''
+            echo("No clyrics executeble found.")
+        else
+            exe system("clyrics " . l:song_name . ">" . l:song_path)
+        endif
+    endif
+    exe "e" fnameescape(l:song_path) | setl buftype=nowrite
+endfunction
+noremap <silent> <leader>al :exe Lyrics(0)<cr>
+noremap <silent> <leader>aL :exe Lyrics(1)<cr>
+
 " global settings
 " no comment formatting
 au BufEnter * silent! set formatoptions-=cro
@@ -154,10 +202,12 @@ au BufEnter * silent! set formatoptions-=cro
 au BufWritePre * :%s/\s\+$//e
 " transparency
 hi Normal guibg=NONE ctermbg=NONE
-" content if no arguments supplied
-au VimEnter * if argc() == 0 | setlocal buftype=nofile | endif
 " autochdir
 set autochdir
+" content if no arguments are supplied
+if argc() == 0
+    setl buftype=nowrite
+end
 
 " modes
 function! ToggleVar(var, message)
@@ -177,6 +227,11 @@ au FocusLost * silent! exec AutoSaveMode?"wa":""
 let HlUnderCursorMode = 0
 nnoremap <silent> <leader>th :let HlUnderCursorMode=ToggleVar(HlUnderCursorMode, 'highlight symbol under cursor mode')<CR>
 au CursorHold * exe HlUnderCursorMode?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none'
+" spellchecker mode
+set spellcapcheck=
+set spelllang=en_us
+au FileType text setl spell
+nnoremap <silent> <leader>tc :setl spell!<cr>
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
@@ -201,9 +256,11 @@ noremap <silent> <leader>ww :Windows!<cr>
 noremap <silent> <leader>pf :GFiles!<cr>
 noremap <silent> <leader>sf :Ag! .<cr>
 noremap <silent> <leader>ff :Files!<cr>
-noremap <silent> <leader>sa :FZF! -x ~<cr>
+nmap <silent> <leader>fs <leader>ff
+noremap <silent> <leader>fa :FZF! -x ~<cr>
 noremap <silent> <leader>sp :Ag!<cr>
 noremap <silent> <leader>ss :BLines!<cr>
+nmap <silent> <leader>sl <leader>ss
 noremap <silent> <leader>s: :History:!<cr>
 noremap <silent> <leader>sc :History:!<cr>
 noremap <silent> <leader>s/ :History/!<cr>
@@ -223,15 +280,31 @@ nmap <leader>D <plug>MoveMotionEndOfLinePlug
 vmap s S
 " vimwiki
 au FileType vimwiki vmap <silent> ,u :s/ /_/g<cr>
-map <silent> <leader>ow <plug>VimwikiIndex
-map <silent> <leader>oW <plug>VimwikiTabIndex
-map <silent> <leader>os <plug>VimwikiUISelect
-map <silent> <leader>oi <plug>VimwikiDiaryIndex
-map <silent> <leader>oj <plug>VimwikiMakeDiaryNote
-map <silent> <leader>oJ <plug>VimwikiTabMakeDiaryNote
-map <silent> <leader>ot :e ~/Dropbox/vimwiki/todos.wiki<cr>
-map <silent> <leader>or <plug>VimwikiRenameLink
-let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki', 'path_html': '~/Dropbox/vimwiki/html', 'template_path': "~/Dropbox/vimwiki/templates"}]
+let g:vimwiki_folding = 'expr'
+let vimwiki_main = {}
+let vimwiki_main.path = '~/Dropbox/vimwiki'
+let vimwiki_main.path_html = vimwiki_main.path . '/html'
+let vimwiki_main.diary_index = 'diary_index'
+let vimwiki_main.template_path = vimwiki_main.path . '/templates'
+let vimwiki_main.template_ext = '.html'
+let vimwiki_main.syntax = 'markdown'
+let vimwiki_main.ext = '.md'
+let g:vimwiki_list = [vimwiki_main]
+nmap <silent> <leader>ow <plug>VimwikiIndex
+nmap <silent> <leader>oW <plug>VimwikiTabIndex
+nmap <silent> <leader>os <plug>VimwikiUISelect
+nmap <silent> <leader>oi <plug>VimwikiDiaryIndex
+nmap <silent> <leader>od <plug>VimwikiMakeDiaryNote
+nmap <silent> <leader>oD <plug>VimwikiTabMakeDiaryNote
+nmap <silent> <leader>oy <plug>VimwikiMakeYesterdayDiaryNote
+nmap <silent> <leader>og <plug>VimwikiDiaryGenerateLinks
+nmap <silent> <leader>or <plug>VimwikiRenameLink
+nmap <silent> <leader>oq <plug>VimwikiDeleteLink
+nmap <silent> <leader>ot :VimwikiTOC<cr>
+nmap <silent> <leader>on :exe "e" vimwiki_main.path . '/notes.md'<cr>
+" markdown
+let g:instant_markdown_autostart = 0
+let g:instant_markdown_slow = 1
 
 " langs
 " format
