@@ -49,6 +49,7 @@ Plug 'othree/xml.vim'
 Plug 'lervag/vimtex'
 Plug 'xuhdev/vim-latex-live-preview'
 " markdown
+Plug 'gabrielelana/vim-markdown'
 Plug 'suan/vim-instant-markdown'
 " notes
 Plug 'vimwiki/vimwiki'
@@ -105,6 +106,7 @@ noremap <silent> <leader>vD :tabe ~/.config/nvim/init.vim<cr>
 noremap <silent> <leader>vd :e ~/.config/nvim/init.vim<cr>
 noremap <silent> <leader>vs :so $MYVIMRC<cr>
 noremap <silent> <leader>vi :PlugInstall<cr>
+noremap <silent> <leader>vc :PlugClean<cr>
 noremap <silent> <leader>vp :so $MYVIMRC<cr>:PlugInstall<cr>
 noremap <silent> <leader>vu :PlugUpdate<cr>
 noremap <silent> <leader>fD :call DeleteFileAndBuffer()<cr>
@@ -204,7 +206,7 @@ hi Normal guibg=NONE ctermbg=NONE
 " autochdir
 set autochdir
 " content if no arguments are supplied
-au VimEnter * if argc() == 0 | setlocal buftype=nofile | endif
+" au VimEnter * if argc() == 0 | setlocal buftype=nofile | endif
 
 " modes
 function! ToggleVar(var, message)
@@ -276,17 +278,17 @@ nmap <leader>dd <plug>MoveMotionLinePlug
 nmap <leader>D <plug>MoveMotionEndOfLinePlug
 vmap s S
 " vimwiki
-au FileType vimwiki vmap <silent> ,u :s/ /_/g<cr>
+let s:vimwiki_main = {}
+let s:vimwiki_main.path = '~/Dropbox/vimwiki'
+let s:vimwiki_main.path_html = s:vimwiki_main.path . '/html'
+let s:vimwiki_main.diary_index = 'diary_index'
+let s:vimwiki_main.template_path = s:vimwiki_main.path . '/templates'
+let s:vimwiki_main.template_ext = '.html'
+let s:vimwiki_main.syntax = 'markdown'
+let g:vimwiki_list = [s:vimwiki_main]
+let g:vimwiki_global_ext = 0
 let g:vimwiki_folding = 'expr'
-let vimwiki_main = {}
-let vimwiki_main.path = '~/Dropbox/vimwiki'
-let vimwiki_main.path_html = vimwiki_main.path . '/html'
-let vimwiki_main.diary_index = 'diary_index'
-let vimwiki_main.template_path = vimwiki_main.path . '/templates'
-let vimwiki_main.template_ext = '.html'
-let vimwiki_main.syntax = 'markdown'
-let vimwiki_main.ext = '.md'
-let g:vimwiki_list = [vimwiki_main]
+au FileType vimwiki vmap <silent> ,u :s/ /_/g<cr>
 nmap <silent> <leader>ow <plug>VimwikiIndex
 nmap <silent> <leader>oW <plug>VimwikiTabIndex
 nmap <silent> <leader>os <plug>VimwikiUISelect
@@ -300,8 +302,14 @@ nmap <silent> <leader>oq <plug>VimwikiDeleteLink
 nmap <silent> <leader>ot :VimwikiTOC<cr>
 nmap <silent> <leader>on :exe "e" vimwiki_main.path . '/notes.md'<cr>
 " markdown
+let g:markdown_enable_mappings = 0
+let g:markdown_include_jekyll_support = 0
+let g:markdown_enable_input_abbreviations = 0
+" markdown preview
+au FileType markdown,vimwiki noremap <silent> ,p :InstantMarkdownPreview<cr>
 let g:instant_markdown_autostart = 0
 let g:instant_markdown_slow = 1
+let g:instant_markdown_open_to_the_world = 1
 
 " langs
 " format
