@@ -49,8 +49,6 @@ Plug 'othree/xml.vim'
 Plug 'lervag/vimtex'
 Plug 'xuhdev/vim-latex-live-preview'
 " markdown
-Plug 'godlygeek/tabular'
-Plug 'plasticboy/vim-markdown'
 Plug 'suan/vim-instant-markdown'
 " notes
 Plug 'vimwiki/vimwiki'
@@ -101,7 +99,8 @@ noremap <silent> <leader>fu :set undoreload=0<cr>:e<cr>
 noremap <silent> <leader>fe :e!<cr>
 noremap <silent> <leader>qq :qa<cr>
 noremap <silent> <leader>qQ :qa!<cr>
-noremap <silent> <leader>qs :wqa<cr>
+noremap <silent> <leader>qw :wqa<cr>
+noremap <silent> <leader>qW :wqa!<cr>
 noremap <silent> <leader>vD :tabe ~/.config/nvim/init.vim<cr>
 noremap <silent> <leader>vd :e ~/.config/nvim/init.vim<cr>
 noremap <silent> <leader>vs :so $MYVIMRC<cr>
@@ -109,7 +108,7 @@ noremap <silent> <leader>vi :PlugInstall<cr>
 noremap <silent> <leader>vp :so $MYVIMRC<cr>:PlugInstall<cr>
 noremap <silent> <leader>vu :PlugUpdate<cr>
 noremap <silent> <leader>fD :call DeleteFileAndBuffer()<cr>
-function DeleteFileAndBuffer()
+function! DeleteFileAndBuffer()
     if confirm('Delete buffer with file?', "&Yes\n&No", 0) == 1
         call delete(expand('%'))
         bdelete!
@@ -205,9 +204,7 @@ hi Normal guibg=NONE ctermbg=NONE
 " autochdir
 set autochdir
 " content if no arguments are supplied
-if argc() == 0
-    setl buftype=nowrite
-end
+au VimEnter * if argc() == 0 | setlocal buftype=nofile | endif
 
 " modes
 function! ToggleVar(var, message)
