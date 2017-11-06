@@ -53,6 +53,9 @@ Plug 'gabrielelana/vim-markdown'
 Plug 'suan/vim-instant-markdown'
 " notes
 Plug 'vimwiki/vimwiki'
+" elixir
+Plug 'elixir-lang/vim-elixir'
+Plug 'slashmili/alchemist.vim'
 call plug#end()
 
 " sets
@@ -85,8 +88,8 @@ let mapleader="\<Space>"
 let maplocalleader=","
 
 " keymaps
-noremap <silent> <leader>ad a<C-R>=strftime('%d/%m/%y')<cr><esc>
-noremap <silent> <leader>aD a<C-R>=strftime('%d/%m/%y %H:%M')<cr><esc>
+noremap <silent> <leader>at a<C-R>=strftime('%d/%m/%y')<cr><esc>
+noremap <silent> <leader>aT a<C-R>=strftime('%d/%m/%y %H:%M')<cr><esc>
 noremap <silent> <leader>al :Loremipsum<space>
 noremap <silent> <leader>bs :enew<cr>
 noremap <silent> <leader>wd :q<cr>
@@ -98,6 +101,7 @@ noremap <silent> <leader>fw :silent! w<cr>
 noremap <silent> <leader>fW :silent! wa<cr>
 noremap <silent> <leader>fu :set undoreload=0<cr>:e<cr>
 noremap <silent> <leader>fe :e!<cr>
+noremap <silent> <leader>fE :bufdo e!<cr>
 noremap <silent> <leader>qq :qa<cr>
 noremap <silent> <leader>qQ :qa!<cr>
 noremap <silent> <leader>qw :wqa<cr>
@@ -111,13 +115,13 @@ noremap <silent> <leader>vp :so $MYVIMRC<cr>:PlugInstall<cr>
 noremap <silent> <leader>vu :PlugUpdate<cr>
 noremap <silent> <leader>fD :call DeleteFileAndBuffer()<cr>
 function! DeleteFileAndBuffer()
-    if confirm('Delete buffer with file?', "&Yes\n&No", 0) == 1
+    if confirm('Delete this buffer and file?', "&Yes\n&No", 0) == 1
         call delete(expand('%'))
         bdelete!
     endif
 endfunction
 noremap <silent> <leader>fd :call delete(expand('%'))<cr>:set modified<cr>
-noremap <silent> <leader>bd :bdelete!<cr>
+noremap <silent> <leader>bd :bd!<cr>
 noremap <silent> <leader>fm :Rename<space>
 noremap <silent> <M-h> :bprevious<cr>
 noremap <silent> <M-l> :bnext<cr>
@@ -129,17 +133,22 @@ nnoremap <silent> <A-l> :bprevious<cr>
 nnoremap <silent> <leader>V ggvG$<cr>
 noremap <silent> <leader>au :MundoToggle<cr>
 noremap <silent> <leader>r :reg<cr>
-noremap <silent> <leader>hb :map
-noremap <silent> <leader>hh :tab h
+noremap <silent> <leader>hb :map<space>
+noremap <silent> <leader>hh :tab h<space>
 noremap <silent> <leader>as :Snippets<cr>
 noremap <silent> <leader>hc :Commands<cr>
 noremap <silent> <leader><tab> :b#<cr>
 noremap Y y$
 noremap <silent> k gk
+noremap <silent> gk k
 noremap <silent> j gj
+noremap <silent> gj j
 noremap <silent> 0 g0
+noremap <silent> g0 0
 noremap <silent> $ g$
+noremap <silent> g$ $
 noremap <silent> ^ g^
+noremap <silent> g^ ^
 for i in range(1, 9)
     " <leader>{n} for window switching
     execute "noremap <silent> <leader>" . i . " :" . i . "wincmd W<cr>"
@@ -162,11 +171,11 @@ endfunction
 
 " translator
 let g:trans_dir = "~/apps/trans/"
-function! Trans(if_delete)
+function! Trans()
     exe system("mkdir -p " . g:trans_dir)
     let l:word = tolower(expand("<cword>"))
     let l:word_path = g:trans_dir . l:word . ".txt"
-    if !filereadable(expand(l:word_path)) || a:if_delete
+    if !filereadable(expand(l:word_path))
         if system("command -v trans") == ''
             echo("No trans executeble found.")
         else
@@ -175,8 +184,8 @@ function! Trans(if_delete)
     endif
     exe "e" fnameescape(l:word_path) | setl buftype=nowrite
 endfunction
-noremap <silent> <leader>at :exe Trans(0)<cr>
-noremap <silent> <leader>aT :exe Trans(1)<cr>
+noremap <silent> <leader>ad :exe Trans()<cr>
+noremap <silent> <leader>aD :tab sb<cr>:exe Trans()<cr>
 
 " lyrics
 let g:lyrics_dir = "~/apps/lyrics/"
@@ -206,7 +215,7 @@ hi Normal guibg=NONE ctermbg=NONE
 " autochdir
 set autochdir
 " content if no arguments are supplied
-" au VimEnter * if argc() == 0 | setlocal buftype=nofile | endif
+au VimEnter * if argc() == 0 | setlocal buftype=nofile | endif
 
 " modes
 function! ToggleVar(var, message)
@@ -229,7 +238,7 @@ au CursorHold * exe HlUnderCursorMode?printf('match IncSearch /\V\<%s\>/', escap
 " spellchecker mode
 set spellcapcheck=
 set spelllang=en_us
-au FileType text setl spell
+au FileType text,vimwiki setl spell
 nnoremap <silent> <leader>tc :call ToggleVar(&spell, 'spellchecker mode')<cr>:setl spell!<cr>
 
 " deoplete
@@ -249,6 +258,8 @@ let NERDTreeMinimalUI=1
 let NERDTreeShowHidden=1
 noremap <silent> <leader>ft :NERDTreeFind<cr>
 noremap <silent> <leader>pt :ProjectRootExe NERDTreeFind<cr>
+let g:NERDTreeMapOpenRecursively = "go"
+let g:NERDTreeMapPreview = "O"
 " fzf
 let $FZF_DEFAULT_COMMAND = 'ag --hidden -l -g ""'
 noremap <silent> <leader>ww :Windows!<cr>
@@ -278,16 +289,16 @@ nmap <leader>dd <plug>MoveMotionLinePlug
 nmap <leader>D <plug>MoveMotionEndOfLinePlug
 vmap s S
 " vimwiki
-let s:vimwiki_main = {}
-let s:vimwiki_main.path = '~/Dropbox/vimwiki'
-let s:vimwiki_main.path_html = s:vimwiki_main.path . '/html'
-let s:vimwiki_main.diary_index = 'diary_index'
-let s:vimwiki_main.template_path = s:vimwiki_main.path . '/templates'
-let s:vimwiki_main.template_ext = '.html'
-let s:vimwiki_main.syntax = 'markdown'
-let g:vimwiki_list = [s:vimwiki_main]
+let g:vimwiki_main = {}
+let g:vimwiki_main.path = '~/Dropbox/vimwiki'
+let g:vimwiki_main.path_html = g:vimwiki_main.path . '/html'
+let g:vimwiki_main.diary_index = 'diary_index'
+let g:vimwiki_main.template_path = g:vimwiki_main.path . '/templates'
+let g:vimwiki_main.template_ext = '.html'
+let g:vimwiki_main.syntax = 'markdown'
+let g:vimwiki_list = [g:vimwiki_main]
 let g:vimwiki_global_ext = 0
-let g:vimwiki_folding = 'expr'
+" let g:vimwiki_folding = 'expr'
 au FileType vimwiki vmap <silent> ,u :s/ /_/g<cr>
 nmap <silent> <leader>ow <plug>VimwikiIndex
 nmap <silent> <leader>oW <plug>VimwikiTabIndex
@@ -300,7 +311,7 @@ nmap <silent> <leader>og <plug>VimwikiDiaryGenerateLinks
 nmap <silent> <leader>or <plug>VimwikiRenameLink
 nmap <silent> <leader>oq <plug>VimwikiDeleteLink
 nmap <silent> <leader>ot :VimwikiTOC<cr>
-nmap <silent> <leader>on :exe "e" vimwiki_main.path . '/notes.md'<cr>
+nmap <silent> <leader>on :exe "e" g:vimwiki_main.path . '/notes.wiki'<cr>
 " markdown
 let g:markdown_enable_mappings = 0
 let g:markdown_include_jekyll_support = 0
@@ -331,3 +342,5 @@ au FileType haskell nnoremap <buffer> <silent> ,c :GhcModTypeClear<cr>
 " TeX
 let g:livepreview_previewer = 'zathura'
 au FileType tex,latex noremap <buffer> ,p :LLPStartPreview<cr>
+" elixir
+let g:alchemist_tag_disable = 1
